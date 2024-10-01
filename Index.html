@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWRCC Impact Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 20px; /* Add some space between hazards, confidence, and extent sections */
+        }
+        .hazards-container, .confidence-container, .extent-container {
+            margin-bottom: 20px;
+        }
+        .impact-display {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Impact Generator for Hazards</h1>
+<p>Select an extent, hazard, and confidence level for corresponding impacts:</p>
+
+<!-- Flexbox container for extent, hazards, and confidence checkboxes -->
+<div class="container">
+    <div class="extent-container">
+        <strong>Extent:</strong><br>
+        <!-- Extent checkboxes will be added here -->
+    </div>
+
+    <div class="hazards-container">
+        <strong>Hazard:</strong><br>
+        <!-- Hazard checkboxes will be added here -->
+    </div>
+
+    <div class="confidence-container">
+        <strong>Confidence:</strong><br>
+        <!-- Confidence checkboxes will be added here -->
+    </div>
+</div>
+
+<div class="impact-display" id="impactDisplay">
+    <!-- Selected impacts, extent, and confidence will appear here -->
+</div>
+
+<script>
+    // Updated data for hazards and impacts
+    const data = [
+        {hazard: "Rain", impact: "ponding in poor drainage areas", Plurality: "Singular"},
+        {hazard: "Rain", impact: "flash flooding", Plurality: "Singular"},
+        {hazard: "Wind", impact: "tree damage and power outages", Plurality: "Plural"},
+        {hazard: "Wind", impact: "tree damage", Plurality: "Singular"},
+        {hazard: "Wind", impact: "power outages", Plurality: "Plural"},
+        {hazard: "Snow", impact: "slick roads", Plurality: "Plural"},
+        {hazard: "Snow", impact: "difficult travel", Plurality: "Singular"},
+    ];
+
+    // Confidence levels and their corresponding text with Plurality
+    const confidenceData = [
+        {level: "Low", confidence_text: " cannot be ruled out.", Plurality: "Plural"},
+        {level: "Low", confidence_text: " cannot be ruled out.", Plurality: "Singular"},
+        {level: "Medium", confidence_text: " are possible.", Plurality: "Plural"},
+        {level: "Medium", confidence_text: " is possible.", Plurality: "Singular"},
+        {level: "High", confidence_text: " are likely.", Plurality: "Plural"},
+        {level: "High", confidence_text: " is likely.", Plurality: "Singular"}
+    ];
+
+    // Extent data
+    const extentData = ["Isolated", "Scattered", "Widespread"];
+
+    const hazardsContainer = document.querySelector('.hazards-container');
+    const confidenceContainer = document.querySelector('.confidence-container');
+    const extentContainer = document.querySelector('.extent-container');
+    const impactDisplay = document.getElementById('impactDisplay');
+
+    // Get unique hazards from data
+    const hazards = [...new Set(data.map(item => item.hazard))];
+
+    // Get unique confidence levels from confidenceData
+    const confidenceLevels = [...new Set(confidenceData.map(item => item.level))];
+
+    // Create checkboxes for each hazard
+    hazards.forEach((hazard, index) => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `hazard${index}`;
+        checkbox.value = hazard;
+
+        // Only allow one hazard to be selected at a time
+        checkbox.addEventListener('change', () => {
+            document.querySelectorAll('.hazards-container input[type="checkbox"]').forEach(cb => {
+                if (cb !== checkbox) cb.checked = false;
+            });
+            updateImpactDisplay();
+        });
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${hazard}`));
+        hazardsContainer.appendChild(label);
+        hazardsContainer.appendChild(document.createElement('br'));
+    });
+
+    // Create checkboxes for each confidence level
+    confidenceLevels.forEach((level, index) => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `confidence${index}`;
+        checkbox.value = level;
+
+        // Only allow one confidence level to be selected at a time
+        checkbox.addEventListener('change', () => {
+            document.querySelectorAll('.confidence-container input[type="checkbox"]').forEach(cb => {
+                if (cb !== checkbox) cb.checked = false;
+            });
+            updateImpactDisplay();
+        });
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${level}`));
+        confidenceContainer.appendChild(label);
+        confidenceContainer.appendChild(document.createElement('br'));
+    });
+
+    // Create checkboxes for each extent level
+    extentData.forEach((extent, index) => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `extent${index}`;
+        checkbox.value = extent;
+
+        // Only allow one extent level to be selected at a time
+        checkbox.addEventListener('change', () => {
+            document.querySelectorAll('.extent-container input[type="checkbox"]').forEach(cb => {
+                if (cb !== checkbox) cb.checked = false;
+            });
+            updateImpactDisplay();
+        });
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${extent}`));
+        extentContainer.appendChild(label);
+        extentContainer.appendChild(document.createElement('br'));
+    });
+
+    // Update the impact display based on selected checkboxes
+    function updateImpactDisplay() {
+        let selectedHazards = [];
+        let selectedConfidenceLevel = null;
+        let selectedExtentLevel = null;
+
+        // Get the selected hazard (only one)
+        document.querySelectorAll('.hazards-container input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedHazards.push(checkbox.value);
+            }
+        });
+
+        // Get selected confidence level (only one)
+        document.querySelectorAll('.confidence-container input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedConfidenceLevel = checkbox.value;
+            }
+        });
+
+        // Get selected extent level (only one)
+        document.querySelectorAll('.extent-container input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedExtentLevel = checkbox.value;
+            }
+        });
+
+        // Ensure extent, hazard, and confidence level are selected
+        if (!selectedExtentLevel || selectedHazards.length === 0 || !selectedConfidenceLevel) {
+            impactDisplay.innerHTML = "Please select one extent, one hazard, and one confidence level.";
+            return;
+        }
+
+        // Find the corresponding confidence text based on impact plurality
+        let selectedImpacts = [];
+        selectedHazards.forEach(hazard => {
+            const matches = data.filter(item => item.hazard === hazard);
+            if (matches.length > 0) {
+                matches.forEach(match => {
+                    let confidenceText = "";
+
+                    // Find correct confidence text based on impact plurality
+                    if (selectedConfidenceLevel) {
+                        const confidenceMatch = confidenceData.find(item =>
+                            item.level === selectedConfidenceLevel && item.Plurality === match.Plurality);
+                        if (confidenceMatch) {
+                            confidenceText = confidenceMatch.confidence_text;
+                        }
+                    }
+
+                    // Extent level now concatenates before the impact, not the hazard
+                    selectedImpacts.push(`${selectedExtentLevel} ${match.impact}${confidenceText}`);
+                });
+            }
+        });
+
+        // Display selected impacts with updated "Impacts for [hazard]" title
+        if (selectedImpacts.length > 0) {
+            const selectedHazardLabel = selectedHazards.length > 0 ? selectedHazards[0] : "Hazard";
+            impactDisplay.innerHTML = `<strong>Impacts for ${selectedHazardLabel}:</strong><ul>` + 
+                                       selectedImpacts.map(impact => `<li>${impact}</li>`).join('') + 
+                                       `</ul>`;
+        } else {
+            impactDisplay.innerHTML = "No matching impacts found.";
+        }
+    }
+</script>
+
+</body>
+</html>
