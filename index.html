@@ -22,6 +22,18 @@
             padding: 10px;
             margin-top: 20px;
         }
+        #copyButton {
+            margin-top: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #copyButton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -51,16 +63,25 @@
     <!-- Selected impacts, extent, and confidence will appear here -->
 </div>
 
+<!-- Button to copy the impacts -->
+<button id="copyButton" onclick="copyImpacts()">Copy Impacts</button>
+
 <script>
     // Updated data for hazards and impacts
     const data = [
         {hazard: "Rain", impact: "ponding in poor drainage areas", Plurality: "Singular"},
         {hazard: "Rain", impact: "flash flooding", Plurality: "Singular"},
-        {hazard: "Wind", impact: "tree damage and power outages", Plurality: "Plural"},
         {hazard: "Wind", impact: "tree damage", Plurality: "Singular"},
         {hazard: "Wind", impact: "power outages", Plurality: "Plural"},
-        {hazard: "Snow", impact: "slick roads", Plurality: "Plural"},
+        {hazard: "Wind", impact: "tree damage and power outages", Plurality: "Plural"},
+        {hazard: "Snow", impact: "slippery roads", Plurality: "Plural"},
         {hazard: "Snow", impact: "difficult travel", Plurality: "Singular"},
+        {hazard: "Snow", impact: "limited visibility", Plurality: "Singular"},
+        {hazard: "Freezing Rain", impact: "slippery roads", Plurality: "Plural"},
+        {hazard: "Freezing Rain", impact: "hazardous travel", Plurality: "Singular"},
+        {hazard: "Freezing Rain", impact: "tree damage", Plurality: "Singular"},
+        {hazard: "Freezing Rain", impact: "power outages", Plurality: "Plural"},
+        {hazard: "Freezing Rain", impact: "tree damage and power outages", Plurality: "Plural"},
     ];
 
     // Confidence levels and their corresponding text with Plurality
@@ -209,16 +230,25 @@
             }
         });
 
-        // Display selected impacts with updated "Impacts for [hazard]" title
+        // Display selected impacts with updated "Impacts" title
         if (selectedImpacts.length > 0) {
             const selectedHazardLabel = selectedHazards.length > 0 ? selectedHazards[0] : "Hazard";
             impactDisplay.innerHTML = `<strong>Impacts for ${selectedHazardLabel}:</strong><ul>` + 
                                     selectedImpacts.map(impact => `<li>${impact}</li>`).join('') + 
-                                    `</ul><p><em>These are generalized impact statements and do not encompass all impacts.</em></p>`;
+                                    `</ul><p><em>These are generalized statements and do not encompass all impacts and nuances.</em></p>`;
         } else {
-            impactDisplay.innerHTML = "No matching impacts found.";
+            impactDisplay.innerHTML = "No impacts found for the selected combination.";
         }
+    }
 
+    // Function to copy the impacts to the clipboard
+    function copyImpacts() {
+        const impactsText = impactDisplay.innerText;
+        navigator.clipboard.writeText(impactsText).then(() => {
+            alert("Impacts copied to clipboard!");
+        }).catch(err => {
+            alert("Failed to copy impacts: " + err);
+        });
     }
 </script>
 
